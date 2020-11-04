@@ -3,6 +3,14 @@ const bodyParser = require('body-parser')
 const app = express()
 const port = 3000
 
+/*
+GET - получение данных
+POST - создание данных
+UPDATE - обновление данных
+PATCH - мелкое обновление данных 
+DELETE - удаление
+*/
+
 function createApplication(storage) {
     app.use(bodyParser.json())
 

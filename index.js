@@ -14,4 +14,4 @@ const { FileStorage } = require('./src/storages/fileStorage')
 const fileStorage = new FileStorage('./data')
 const memoryStorage = new Storage()
 
-createApplication(memoryStorage)
+createApplication(fileStorage)
