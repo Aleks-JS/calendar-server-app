@@ -63,10 +63,10 @@ function createApplication(storage) {
 
   app.delete("/:id", (req, res) => {
     const id = req.params.id;
-    storage.delete(id);
+    const success = storage.delete(id);
     res
       .json({
-        success: true,
+        success,
       })
       .status(200);
   });

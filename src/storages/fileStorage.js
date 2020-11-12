@@ -16,6 +16,7 @@ class FileStorage {
         ...event,
       })
     );
+    return this.get(id);
   }
 
   toArray() {
@@ -27,7 +28,9 @@ class FileStorage {
   }
 
   delete(id) {
+    const deleteFile = this.get(id);
     fs.unlinkSync(`${this.pathPrefix}/${id}.json`);
+    return deleteFile;
   }
 
   get(id) {

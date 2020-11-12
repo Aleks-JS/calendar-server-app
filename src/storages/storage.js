@@ -12,7 +12,7 @@ class Storage {
       id,
       ...event,
     };
-    return true;
+    return this._memory[id];
   }
 
   toArray() {
@@ -20,7 +20,9 @@ class Storage {
   }
 
   delete(id) {
+    const deleteItem = this._memory[id];
     delete this._memory[id];
+    return deleteItem;
   }
 
   get(id) {
@@ -35,7 +37,7 @@ class Storage {
       id,
       ...event,
     };
-    return true;
+    return this._memory[id];
   }
 }
 
