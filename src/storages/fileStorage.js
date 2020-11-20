@@ -1,6 +1,6 @@
-const { nanoid } = require("nanoid");
-const fs = require("fs");
-const glob = require("glob");
+const { nanoid } = require('nanoid');
+const fs = require('fs');
+const glob = require('glob');
 
 class FileStorage {
   constructor(prefix) {
@@ -22,7 +22,7 @@ class FileStorage {
   toArray() {
     const arr = [];
     glob.sync(`${this.pathPrefix}/*.json`).forEach((file) => {
-      arr.push(JSON.parse(fs.readFileSync(`${file}`, "utf8")));
+      arr.push(JSON.parse(fs.readFileSync(`${file}`, 'utf8')));
     });
     return arr;
   }
@@ -34,7 +34,7 @@ class FileStorage {
   }
 
   get(id) {
-    const buff = fs.readFileSync(`${this.pathPrefix}/${id}.json`, "utf8");
+    const buff = fs.readFileSync(`${this.pathPrefix}/${id}.json`, 'utf8');
     return JSON.parse(buff);
   }
 
@@ -49,6 +49,18 @@ class FileStorage {
         return event;
       }
     );
+  }
+
+  getAsync(id) {
+    return new Promise((res, rej) => {
+      fs.readFile(`${this.pathPrefix}/${id}.json`, 'utf8', (err, data) => {
+        if (err) {
+          rej(err);
+          return;
+        }
+        res(JSON.parse(data));
+      });
+    });
   }
 }
 

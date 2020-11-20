@@ -1,5 +1,5 @@
-const express = require("express");
-const bodyParser = require("body-parser");
+const express = require('express');
+const bodyParser = require('body-parser');
 const app = express();
 const port = 3000;
 
@@ -14,11 +14,24 @@ DELETE - удаление
 function createApplication(storage) {
   app.use(bodyParser.json());
 
-  app.get("/", (req, res) => {
-    res.json(storage.toArray());
+  app.get('/all', (req, res) => {
+    res.status(200).json(storage.toArray());
   });
 
-  app.get("/:id", (req, res) => {
+  app.get('/async/:id', async (req, res) => {
+    const id = req.params.id;
+    const item = await storage.getAsync(id);
+
+    if (!id || !item) {
+      res.status(404).json({
+        success: false,
+      });
+      return;
+    }
+    res.status(200).json(item);
+  });
+
+  app.get('/:id', (req, res) => {
     const id = req.params.id;
     const item = storage.get(id);
 
@@ -28,10 +41,10 @@ function createApplication(storage) {
       });
       return;
     }
-    res.json(item);
+    res.status(200).json(item);
   });
 
-  app.put("/:id", (req, res) => {
+  app.put('/:id', (req, res) => {
     const id = req.params.id;
     const body = req.body;
     const item = storage.get(id);
@@ -43,14 +56,14 @@ function createApplication(storage) {
         .json({
           success: false,
         })
-        .send("Event not found");
+        .send('Event not found');
       return;
     }
     storage.change(id, changedItem);
-    res.json(changedItem);
+    res.status(200).json(changedItem);
   });
 
-  app.post("/", (req, res) => {
+  app.post('/', (req, res) => {
     const success = storage.add({
       ...req.body,
     });
@@ -61,7 +74,7 @@ function createApplication(storage) {
       .status(200);
   });
 
-  app.delete("/:id", (req, res) => {
+  app.delete('/:id', (req, res) => {
     const id = req.params.id;
     const success = storage.delete(id);
     res
