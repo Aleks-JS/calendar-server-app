@@ -1,7 +1,11 @@
 const express = require('express');
 const bodyParser = require('body-parser');
+const basicAuth = require('express-basic-auth');
+const mongoose = require('mongoose');
+const authRouter = require('../src/authRouter');
+const PORT = process.env.PORT || 3000;
+
 const app = express();
-const port = 3000;
 
 /*
 GET - получение данных
@@ -12,83 +16,102 @@ DELETE - удаление
 */
 
 function createApplication(storage) {
-  app.use(bodyParser.json());
+	app.use(bodyParser.json());
+	app.use('/auth', authRouter);
 
-  app.get('/all', (req, res) => {
-    res.status(200).json(storage.toArray());
-  });
+	app.use(
+		basicAuth({
+			users: {admin: 'supersecret'},
+		})
+	);
 
-  app.get('/async/:id', async (req, res) => {
-    const id = req.params.id;
-    const item = await storage.getAsync(id);
 
-    if (!id || !item) {
-      res.status(404).json({
-        success: false,
-      });
-      return;
-    }
-    res.status(200).json(item);
-  });
+	app.get('/all', (req, res) => {
+		console.log(storage.toArray())
+		res.status(200).json(storage.toArray());
+	});
 
-  app.get('/:id', (req, res) => {
-    const id = req.params.id;
-    const item = storage.get(id);
+	app.get('/async/:id', async (req, res) => {
+		const id = req.params.id;
+		const item = await storage.getAsync(id);
 
-    if (!id || !item) {
-      res.status(404).json({
-        success: false,
-      });
-      return;
-    }
-    res.status(200).json(item);
-  });
+		if (!id || !item) {
+			res.status(404).json({
+				success: false,
+			});
+			return;
+		}
+		res.status(200).json(item);
+	});
 
-  app.put('/:id', (req, res) => {
-    const id = req.params.id;
-    const body = req.body;
-    const item = storage.get(id);
-    const changedItem = { ...item, ...body };
+	app.get('/:id', (req, res) => {
+		const id = req.params.id;
+		const item = storage.get(id);
 
-    if (!id || !item) {
-      res
-        .status(500)
-        .json({
-          success: false,
-        })
-        .send('Event not found');
-      return;
-    }
-    storage.change(id, changedItem);
-    res.status(200).json(changedItem);
-  });
+		if (!id || !item) {
+			res.status(404).json({
+				success: false,
+			});
+			return;
+		}
+		res.status(200).json(item);
+	});
 
-  app.post('/', (req, res) => {
-    const success = storage.add({
-      ...req.body,
-    });
-    res
-      .json({
-        success: success,
-      })
-      .status(200);
-  });
+	app.put('/:id', (req, res) => {
+		const id = req.params.id;
+		const body = req.body;
+		const item = storage.get(id);
+		const changedItem = {...item, ...body};
 
-  app.delete('/:id', (req, res) => {
-    const id = req.params.id;
-    const success = storage.delete(id);
-    res
-      .json({
-        success,
-      })
-      .status(200);
-  });
+		if (!id || !item) {
+			res
+				.status(500)
+				.json({
+					success: false,
+				})
+				.send('Event not found');
+			return;
+		}
+		storage.change(id, changedItem);
+		res.status(200).json(changedItem);
+	});
 
-  app.listen(port, () => {
-    console.log(`Example app listening at http://localhost:${port}`);
-  });
+	app.post('/events', (req, res) => {
+		console.log(req.body);
+		const success = storage.add({
+			...req.body,
+		});
+		res
+			.json({
+				success: success,
+			})
+			.status(200);
+	});
+
+	app.delete('/:id', (req, res) => {
+		const id = req.params.id;
+		const success = storage.delete(id);
+		res
+			.json({
+				success,
+			})
+			.status(200);
+	});
+
+	const start = async () => {
+		try {
+			await mongoose.connect(`mongodb+srv://aleks-JS:UdlxQhTPByNbln83@cluster0.sa9n1.mongodb.net/calendar_app?retryWrites=true&w=majority`)
+			app.listen(PORT, () => {
+				console.log(`Example app listening at http://localhost:${PORT}`);
+			});
+		} catch (e) {
+			console.log(e)
+		}
+	}
+
+	start();
 }
 
 module.exports = {
-  createApplication,
+	createApplication,
 };

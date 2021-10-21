@@ -39,15 +39,11 @@ class FileStorage {
   }
 
   change(id, event) {
-    fs.writeFile(
+    fs.writeFileSync(
       `${this.pathPrefix}/${id}.json`,
       JSON.stringify({
         ...event,
-      }),
-      (err) => {
-        if (err) throw err;
-        return event;
-      }
+      })
     );
   }
 
