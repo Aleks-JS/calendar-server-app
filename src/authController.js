@@ -15,6 +15,7 @@ const generateAccessToken = (id, roles) => {
 }
 
 class AuthController {
+	/** Регистрация */
 	async registration(req, res) {
 		try {
 			/** Передаем в валидатор реквест */
@@ -45,6 +46,7 @@ class AuthController {
 
 	}
 
+	/** Авторизация */
 	async login(req, res) {
 		try {
 			const {username, password} = req.body
@@ -69,9 +71,11 @@ class AuthController {
 
 	}
 
+	/** Получение списка пользователей */
 	async getUsers(req, res) {
 		try {
-			res.json('getUsers response')
+			const users = await User.find()
+			res.json(users)
 		} catch (e) {
 
 			console.log(e)
