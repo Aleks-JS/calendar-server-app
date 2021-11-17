@@ -3,6 +3,8 @@ const bodyParser = require('body-parser');
 const basicAuth = require('express-basic-auth');
 const mongoose = require('mongoose');
 const authRouter = require('../src/authRouter');
+const cors = require('cors');
+const { createProxyMiddleware, responseInterceptor } = require('http-proxy-middleware');
 const PORT = process.env.PORT || 3000;
 
 const app = express();
@@ -16,6 +18,19 @@ DELETE - удаление
 */
 
 function createApplication(storage) {
+	const corsOptions = {
+		origin: 'http://localhost:4200',
+		optionsSuccessStatus: 200
+	}
+	app.use(cors(corsOptions));
+	app.options('*', cors());
+	app.use('/weather', createProxyMiddleware({
+		target: 'https://www.metaweather.com',
+		changeOrigin: true,
+		pathRewrite: {
+			'^/weather': ''
+		}
+	}));
 	app.use(bodyParser.json());
 	app.use('/auth', authRouter);
 
@@ -24,7 +39,6 @@ function createApplication(storage) {
 			users: {admin: 'supersecret'},
 		})
 	);
-
 
 	app.get('/all', (req, res) => {
 		console.log(storage.toArray())
