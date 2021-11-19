@@ -2,7 +2,8 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const basicAuth = require('express-basic-auth');
 const mongoose = require('mongoose');
-const authRouter = require('../src/authRouter');
+const authRouter = require('./routes/authRouter');
+const eventsRouter = require('./routes/eventsRouter');
 const cors = require('cors');
 const { createProxyMiddleware, responseInterceptor } = require('http-proxy-middleware');
 const PORT = process.env.PORT || 3000;
@@ -33,6 +34,7 @@ function createApplication(storage) {
 	}));
 	app.use(bodyParser.json());
 	app.use('/auth', authRouter);
+	app.use('/event', eventsRouter);
 
 	app.use(
 		basicAuth({
