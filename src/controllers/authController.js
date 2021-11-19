@@ -1,9 +1,9 @@
-const User = require('../src/models/User')
-const Role = require('./models/Role')
+const User = require('../models/User')
+const Role = require('../models/Role')
 const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
 const {validationResult} = require('express-validator')
-const {secret} = require('./config')
+const {secret} = require('../config')
 
 /** Генерация токена */
 const generateAccessToken = (id, roles) => {
@@ -24,7 +24,7 @@ class AuthController {
 				return res.status(400).json({message: 'Registration error', errors})
 			}
 			/** Реквест */
-			const {username, password} = req.body
+			const {username, password, email} = req.body
 			/** Проверяем наличие пользователя в БД */
 			const candidate = await User.findOne({username})
 			if (candidate) {
@@ -35,12 +35,13 @@ class AuthController {
 			/** Получаем роль юзера из БД */
 			const userRole = await Role.findOne({value: 'USER'})
 			/** Создаем нового юзера */
-			const user = new User({username, password: hashPassword, roles: [userRole.value]})
+			const user = new User({username, email, password: hashPassword, profile:{birthday: null, location: null}, roles: [userRole.value]})
 			/** Сохранение юзера в БД */
-			user.save()
+			await user.save()
 			return res.status(200).json({message: 'User registered successfully!'})
 		} catch (e) {
-			console.log(e)
+			console.log('ERROR => ', e.errors, ' END')
+			const errorMessages = e.errors
 			res.status(400).json({message: 'Registration error'})
 		}
 
