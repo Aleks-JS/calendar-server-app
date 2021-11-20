@@ -7,8 +7,8 @@ const eventPrepareMiddleware = require('./../middleware/eventPrepareMiddleware')
 /** TODO: валидация запросов?? express-validator */
 router.post('/all', authMiddleware, controller.all)
 router.get('/:id', authMiddleware, controller.event)
-router.put('/update/:id', authMiddleware, controller.update)
+router.put('/update', authMiddleware, controller.update)
 router.post('/add', authMiddleware, eventPrepareMiddleware, controller.add)
-router.delete('delete/:id', authMiddleware, controller.delete)
+router.delete('/delete/:id', authMiddleware, controller.delete)
 
 module.exports = router

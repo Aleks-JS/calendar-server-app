@@ -1,5 +1,6 @@
 const {Schema, model} = require('mongoose');
 
+/** Модель событя, сохраняемая в БД */
 const EventSchema = new Schema({
 	userId: String,
 	title: {type: String, required: true},
@@ -21,14 +22,16 @@ const EventSchema = new Schema({
 	timestamps: {createdAt: 'created_at', updatedAt: 'update_at'}
 })
 
-class Event {
+/**
+ * Сокращенная модель события,передаваемая на фронт
+ *
+ * */
+class ShortEvent {
 	constructor(event) {
 		this.id = event._id;
 		this.title = event.title;
 		this.attributes = this.transformAttributes(event.attributes);
-		this.content = event.content;
 	}
-
 	transformAttributes(attr) {
 		const attributes = {};
 		Object.keys(attr).forEach(key => {
@@ -53,8 +56,51 @@ class Event {
 	}
 }
 
+/**
+ * Полная модель события,передаваемая на фронт
+ *
+ * */
+class Event extends ShortEvent {
+	constructor(event) {
+		super(event);
+		this.id = event._id;
+		this.title = event.title;
+		this.attributes = super.transformAttributes(event.attributes);
+		this.content = event.content;
+		this.create = event.created_at;
+		this.update = event.update_at;
+	}
+}
+
+/**
+ * Модель обновления события в БД
+ *
+ * */
+class UpdateModel {
+	constructor(event, userId) {
+		this.userId = userId;
+		this.title = event.title;
+		this.attributes = {
+			startDate: new Date(event.attributes.startDate).getTime(),
+			endDate: new Date(event.attributes.endDate).getTime(),
+			createDate: new Date(event.attributes.createDate).getTime(),
+			type: event.type,
+			event: event.event,
+			reminded: {
+				reminderTime: new Date(event.attributes.reminded.reminderTime).getTime(),
+				needToReminded: event.attributes.reminded.needToReminded
+			}
+		};
+		this.content = {
+			description: event.content.description
+		}
+	}
+}
+
 /** Модель события в БД */
 module.exports = {
 	EventModel: model('Event', EventSchema),
-	Event
+	Event,
+	ShortEvent,
+	UpdateModel
 }
