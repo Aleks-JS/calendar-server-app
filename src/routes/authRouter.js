@@ -25,6 +25,6 @@ router.post('/registration', [
 ], controller.registration)
 router.post('/login', controller.login)
 /** Доступ к списку пользователей только для админа */
-router.get('/users', roleMiddleware(['ADMIN']), controller.getUsers)
+router.get('/users', /*roleMiddleware(['ADMIN']),*/authMiddleware, controller.getUsers)
 
 module.exports = router

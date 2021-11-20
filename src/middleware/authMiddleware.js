@@ -7,7 +7,9 @@ module.exports = function (req, res, next) {
 
 	try {
 		/** Авторизация через токен */
-		const token = req.headers.authorization.split(' ')[1]
+		const token = req.headers.authorization
+			? req.headers.authorization.split(' ')[1]
+			: null
 		if (!token) {
 			return res.status(403).json({message: 'User is not logged in'})
 		}

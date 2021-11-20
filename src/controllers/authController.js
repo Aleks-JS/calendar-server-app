@@ -62,7 +62,7 @@ class AuthController {
 				return res.status(400).json({message: `Wrong password entered!`})
 			}
 			/** Создание токена */
-			const token = generateAccessToken(user._id, user.roles)
+			const token = await generateAccessToken(user._id, user.roles)
 			/** Передача токена клиенту */
 			return res.json({token})
 		} catch (e) {
