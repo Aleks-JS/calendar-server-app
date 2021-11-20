@@ -12,6 +12,7 @@ module.exports = function (roles) {
 			if (!token) {
 				return res.status(403).json({message: 'User is not logged in'})
 			}
+		console.log(jwt.verify(token, secret))
 			const {roles: userRoles} = jwt.verify(token, secret)
 			let hasRole = false;
 			userRoles.forEach(role => {
