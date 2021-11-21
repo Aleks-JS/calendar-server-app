@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken')
-const {secret} = require('./../config')
+const {secret} = require('./../config/app')
 /** Авторизация для определенной роли */
 module.exports = function (roles) {
 	return function (req, res, next) {

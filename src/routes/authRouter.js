@@ -24,6 +24,7 @@ router.post('/registration', [
 		.withMessage('The entered email is not correct')
 ], controller.registration)
 router.post('/login', controller.login)
+router.post('/refresh-tokens', controller.refreshTokens)
 /** Доступ к списку пользователей только для админа */
 router.get('/users', /*roleMiddleware(['ADMIN']),*/authMiddleware, controller.getUsers)
 

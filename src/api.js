@@ -1,14 +1,11 @@
 const express = require('express');
-const bodyParser = require('body-parser');
 const basicAuth = require('express-basic-auth');
 const mongoose = require('mongoose');
-const authRouter = require('./routes/authRouter');
-const eventsRouter = require('./routes/eventsRouter');
-const cors = require('cors');
-const { createProxyMiddleware, responseInterceptor } = require('http-proxy-middleware');
+const config = require('./config/app')
 const PORT = process.env.PORT || 3000;
 
 const app = express();
+require('./config/express')(app)
 
 /*
 GET - получение данных
@@ -19,23 +16,6 @@ DELETE - удаление
 */
 
 function createApplication(storage) {
-	const corsOptions = {
-		origin: 'http://localhost:4200',
-		optionsSuccessStatus: 200
-	}
-	app.use(cors(corsOptions));
-	app.options('*', cors());
-	app.use('/weather', createProxyMiddleware({
-		target: 'https://www.metaweather.com',
-		changeOrigin: true,
-		pathRewrite: {
-			'^/weather': ''
-		}
-	}));
-	app.use(bodyParser.json());
-	app.use('/auth', authRouter);
-	app.use('/event', eventsRouter);
-
 	app.use(
 		basicAuth({
 			users: {admin: 'supersecret'},
@@ -116,7 +96,7 @@ function createApplication(storage) {
 
 	const start = async () => {
 		try {
-			await mongoose.connect(`mongodb+srv://aleks-JS:UdlxQhTPByNbln83@cluster0.sa9n1.mongodb.net/calendar_app?retryWrites=true&w=majority`)
+			await mongoose.connect(config.mongoUri)
 			app.listen(PORT, () => {
 				console.log(`Example app listening at http://localhost:${PORT}`);
 			});
